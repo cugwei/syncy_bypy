@@ -1,0 +1,29 @@
+
+config syncy
+	option apikey ''
+	option authcode ''
+	option excludefiles '*/Thumbs.db'
+	option threadnumber '4'
+	option blocksize '10'
+	option retrytimes '3'
+	option maxrecvspeed '0'
+	option syncperiod '0-24'
+	option retrydelay '3'
+	option datacache 'on'
+	option ondup 'rename'
+	option speedlimitperiod '0-0'
+	option maxsendspeed '0'
+	option listnumber '100'
+	option syncinterval '3600'
+	option syncylog ''
+	option tasknumber '2'
+
+config syncpath
+	#option localpath '/mnt/example'
+	#option remotepath '/apps/SyncY/example'
+	#option enable '1'
+	#option synctype 'upload'
+	#option encryption 'ARC4'	# 0 is disable encryption
+	#option encryptkey 'This is a encrypt key'
+
+config syncytoken
