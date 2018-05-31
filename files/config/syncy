@@ -1,6 +1,5 @@
 
 config syncy
-	option apikey ''
 	option authcode ''
 	option excludefiles '*/Thumbs.db'
 	option threadnumber '4'

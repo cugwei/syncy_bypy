@@ -110,18 +110,18 @@ end
 
 --[[<script language=\"JavaScript\">function myrefresh(){window.location.reload();}setTimeout('myrefresh()',5000);</script>]]--
 if nixio.fs.access("/tmp/syncy.bind") then
-	local usercode = nixio.fs.readfile("/tmp/syncy.bind")
-	usercode = usercode:match(".*\"user_code\":\"([0-9a-z]+)\".*")
-	if usercode then
-		sybind = s:taboption("setting",Button, "cpbind", translate("已完成百度授权，继续帐号绑定"))
+	local apikey = nixio.fs.readfile("/tmp/syncy.bind")
+	apikey = usercode:match(".*\"api_key\":\"([0-9a-z]+)\".*")
+	if apikey then
+		sybind = s:taboption("setting",Button, "cpbind", translate("请完成百度授权，并回填认证码【确保输入了\"AUTH CODE\"之后再点击】"))
 		sybind.inputstyle = "save"
-		sybind.description = "<strong>绑定操作步骤：</strong><br/>1、打开百度授权页面：<a target=\"_blank\" href=\"https://openapi.baidu.com/device\">https://openapi.baidu.com/device</a><br/>2、登录百度帐号并输入用户码：<strong><font color=\"red\">%s</font></strong>，点击继续按钮完成授权<br/>3、完成授权后点击上面的按钮完成绑定操作<br/><strong><font color=\"red\">请在30分钟内完成以上操作<br/>要取消绑定操作，直接点击上面完成按钮即可（不会修改原有授权信息）</font></strong>" %{usercode}
+		sybind.description = "<strong>绑定操作步骤：</strong><br/>1、打开百度授权页面：<a target=\"_blank\" href=\"https://openapi.baidu.com/device\">https://openapi.baidu.com/oauth/2.0/authorize?client_id=%s&response_type=code&redirect_uri=oob&scope=basic%%20netdisk</a><br/>2、登录百度帐号并完成授权后，复制授权页面上的认证码并输入到\"AUTH CODE\"中，然后点击上面的按钮完成绑定操作<br/><strong><font color=\"red\">请在30分钟内完成以上操作<br/>要取消绑定操作，直接点击上面完成按钮即可（不会修改原有授权信息）</font></strong>" %{apikey}
 	else
 		sybind = s:taboption("setting", Button, "sybind", translate("帐号绑定/重新绑定"))
 		sybind.inputstyle = "apply"
 		local binded = nixio.fs.readfile("/etc/config/syncy")
-		binded = binded:match(".*option (device_code) '([0-9a-z]+)'.*")
-		if binded == "device_code" then
+		binded = binded:match(".*option (expires_in) '([0-9]+)'.*")
+		if binded == "expires_in" then
 			sybind.title = "重新绑定百度帐号"
 			sybind.description = "要想重新绑定必须先在百度帐号管理中解除SyncY的绑定。"
 		else
@@ -132,8 +132,8 @@ else
 	sybind = s:taboption("setting", Button, "sybind", translate("帐号绑定/重新绑定"))
 	sybind.inputstyle = "apply"
 	local binded = nixio.fs.readfile("/etc/config/syncy")
-	binded = binded:match(".*option (device_code) '([0-9a-z]+)'.*")
-	if binded == "device_code" then
+	binded = binded:match(".*option (expires_in) '([0-9]+)'.*")
+	if binded == "expires_in" then
 		sybind.title = "重新绑定百度帐号"
 		sybind.description = "要想重新绑定必须先在百度帐号管理中解除SyncY的绑定。"
 		
@@ -147,8 +147,8 @@ sybind.write = function(self, section, value)
 		self.option = "sybind"
 		self.inputstyle = "apply"
 		local binded = nixio.fs.readfile("/etc/config/syncy")
-		binded = binded:match(".*option (device_code) '([0-9a-z]+)'.*")
-		if binded == "device_code" then
+		binded = binded:match(".*option (expires_in) '([0-9]+)'.*")
+		if binded == "expires_in" then
 			sybind.title = "重新绑定百度帐号"
 		else
 			sybind.title = "绑定百度帐号"
@@ -163,21 +163,20 @@ sybind.write = function(self, section, value)
 		end
 	else
 		if opstatus == 0 and nixio.fs.access("/tmp/syncy.bind") then
-			local usercode = nixio.fs.readfile("/tmp/syncy.bind")
-			usercode = usercode:match(".*\"user_code\":\"([0-9a-z]+)\".*")
+			local apikey = nixio.fs.readfile("/tmp/syncy.bind")
+			apikey = usercode:match(".*\"api_key\":\"([0-9a-z]+)\".*")
 			self.option = "sybind"
 			self.inputstyle = "save"
-			self.title = "已完成百度授权，继续帐号绑定"
+			self.title = "请完成百度授权"
 			self.description = "<script language=\"JavaScript\">window.location=location;</script>"
 		else
-			self.description = "<strong><font color=\"red\">获取用户码失败！</font></strong>"
+			self.description = "<strong><font color=\"red\">获取百度认证码失败！</font></strong>"
 		end
 	end
 end
 
 s:taboption("setting", Value, "syncylog", translate("日志文件"),translate("日志文件名必须包含完整路径名。"))
-s:taboption("setting", Value, "apikey", translate("API KEY"),translate("具有PCS API访问权限的APP的API KEY。")).rmempty = false
-s:taboption("setting", Value, "secretkey", translate("SECRET KEY"),translate("具有PCS API访问权限的APP的SECRET KEY。")).rmempty = false
+s:taboption("setting", Value, "authcode", translate("AUTH CODE"),translate("在百度开放平台成功授权之后生成的认证码AUTH CODE。")).rmempty = false
 s:taboption("setting", Value, "tasknumber", translate("同时同步的任务数")).rmempty = false
 s:taboption("setting", Value, "threadnumber", translate("每个任务的线程数")).rmempty = false
 s:taboption("setting", Value, "blocksize", translate("分片上传下载块大小(M)")).rmempty = false

@@ -62,6 +62,7 @@ __DEBUG__ = False
 __author__ = "WishInLife <wishinlife@qq.com>"
 
 BYPY_VERSION = '1.6.4'
+BYPY_APIKEY = 'q8WE4EpCsau1oS0MplgMKNBn'
 
 GaeUrl = 'https://bypyoauth.appspot.com'
 OpenShiftUrl = 'https://bypyoauth-route-bypy.a3c1.starter-us-west-1.openshiftapps.com'
@@ -155,7 +156,6 @@ class SyncY:
     encryptkey = ''
     stop = False
     config = {
-        'apikey'		: 'q8WE4EpCsau1oS0MplgMKNBn',
         'authcode'		: '',
         'syncylog'		: '',
         'blocksize'		: 10,
@@ -254,17 +254,13 @@ class SyncY:
             sys.stderr = open(SyncY.config['syncylog'], 'a', 0)
             sys.stdout = sys.stderr
 
-        if SyncY.config['apikey'].strip(' ') == '':
-            print('%s ERROR: "apikey" must set.' % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
-            sys.exit(1)
-
         if 'refresh_token' not in SyncY.syncytoken or SyncY.syncytoken['refresh_token'] == '' or (len(self.__argv) != 0 and self.__argv[0] in ['sybind', 'cpbind']):
             sycurl = SYCurl()
             if (('authurl' not in SyncY.syncytoken or SyncY.syncytoken['authurl'] == '') and len(self.__argv) == 0) or (len(self.__argv) != 0 and self.__argv[0] == 'sybind'):
-                auth_url = "https://openapi.baidu.com/oauth/2.0/authorize?client_id=%s&response_type=code&redirect_uri=oob&scope=basic%%20netdisk" % SyncY.config['apikey']
+                auth_url = "https://openapi.baidu.com/oauth/2.0/authorize?client_id=%s&response_type=code&redirect_uri=oob&scope=basic%%20netdisk" % BYPY_APIKEY
                 if len(self.__argv) != 0 and self.__argv[0] == 'sybind':
                     with open(__TMP_DIR__ + '/syncy.bind', 'w') as sybind:
-                        sybind.write('{"auth_url":"%s","time":%d}' % (auth_url, int(time.time())))
+                        sybind.write('{"auth_url":"%s","api_key":"%s","time":%d}' % (auth_url, BYPY_APIKEY, int(time.time())))
                     sys.exit(0)
                 SyncY.syncytoken['authurl'] = auth_url
                 print('Device binding Guide:')
@@ -455,7 +451,7 @@ class SyncY:
         #             printlog('%s WARNING: %s' % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), smessage.encode(__CHARSET__)))
         if (SyncY.syncytoken['refresh_date'] + SyncY.syncytoken['expires_in'] - 864000) > int(time.time()):
             return
-        retcode, retbody = sycurl.request('https://openapi.baidu.com/oauth/2.0/token', {}, {'grant_type': 'refresh_token', 'refresh_token': SyncY.syncytoken['refresh_token'], 'client_id': SyncY.config['apikey'], 'client_secret': SyncY.config['secretkey']}, 'POST', SYCurl.Normal)
+        retcode, retbody = sycurl.request('https://openapi.baidu.com/oauth/2.0/token', {}, {'grant_type': 'refresh_token', 'refresh_token': SyncY.syncytoken['refresh_token'], 'client_id': BYPY_APIKEY, 'client_secret': SyncY.config['secretkey']}, 'POST', SYCurl.Normal)
         responses = json.loads(retbody)
         try:
             if retcode != 200:
