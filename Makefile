@@ -15,6 +15,7 @@ define Package/$(PKG_NAME)
         TITLE:=SyncY
         PKGARCH:=all
         MAINTAINER:=WishInLife
+		URL:=https://http://www.syncy.cn
 endef
 
 define Package/$(PKG_NAME)/description
